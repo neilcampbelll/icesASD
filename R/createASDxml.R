@@ -1,7 +1,7 @@
 
 #' Create the XML format for catch scenario data
 #'
-#' Create the XML format for catch scenario data
+#' Deprecated: use \code{\link{writeASDxml}} instead.
 #'
 #' @param info details
 #' @param scenarioColumns details
@@ -18,6 +18,7 @@
 #' @export
 createASDxml <-
   function(info, scenarioColumns, scenarioRows, scenarioValues, scenarioNotes) {
+    .Deprecated("writeASDxml")
     if (is.na(info$Purpose)) {
       info$Purpose <- "Advice"
     }

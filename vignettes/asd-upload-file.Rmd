@@ -1,0 +1,190 @@
+---
+title: "Creating a catch scenarios upload file"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Creating a catch scenarios upload file}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(icesASD)
+```
+
+The catch scenarios table of an ICES advice sheet is uploaded to the
+Advice and Scenarios Database as an XML file at <https://asd.ices.dk>.
+The XML file is usually made with the ICES catch scenarios Excel template;
+this vignette shows how to make the same file in R with **icesASD**.
+
+The example is the 2026 advice for greater silver smelt (*Argentina silus*)
+in divisions 5.b and 6.a (`aru.27.5b6a`).
+
+The file is built from five pieces:
+
+| Piece | Function | Excel template |
+|---|---|---|
+| Stock information | `asdInfo()` | top of the *Catch Scenarios* sheet |
+| Column headers | `asdColumns()` | table headers, year and units rows |
+| Row headers | `asdRows()` | basis and scenario labels |
+| Values | a data frame | the body of the table |
+| Footnotes | `asdNotes()` | the *Catch Scenario Notes* sheet |
+
+## The catch scenarios table
+
+The table for this stock is included in the package as a CSV file, laid out
+as it appears in the advice sheet: the purpose, basis and label of each
+scenario, followed by one column per variable.
+
+```{r read}
+tab <- read.csv(
+  system.file("extdata", "aru.27.5b6a_2026_catch_scenarios.csv", package = "icesASD"),
+  check.names = FALSE, encoding = "UTF-8"
+)
+tab[, c("CS_Purpose", "CS_Label", "Total catch", "F 6–14")]
+```
+
+## Stock information
+
+```{r info}
+info <- asdInfo(
+  stockCode = "aru.27.5b6a",
+  AssessmentYear = 2026,
+  contact = "Assessor Name"
+)
+```
+
+The purpose is always `"Advice"`, as in the Excel template.
+
+## Column headers
+
+Each column has a label, the year it refers to and a unit. Units are ICES
+[MUNIT](https://vocab.ices.dk/?ref=155) codes such as `t`, `ratio` and `%`.
+For % change columns, the year is the last year of the comparison.
+Footnote symbols are part of the label.
+
+```{r columns}
+columns <- asdColumns(
+  AK_Label = names(tab)[-(1:3)],
+  YearLabel = c(2027, 2027, 2027, 2027, 2027, 2027, 2028, 2028, 2027, 2027, 2028),
+  Unit = c("t", "t", "t", "ratio", "ratio", "ratio", "t", "%", "%", "%", "%")
+)
+columns
+```
+
+The column IDs (`AK_ID`) follow the Excel template, where the first column of
+the table is column E (5). Up to 50 columns are allowed.
+
+The type of each column can optionally be given in `CatchScenarioVariables`,
+using codes from the ICES [StockDataType](https://vocab.ices.dk/?ref=1528)
+vocabulary (`Catch`, `FishingPressure`, `StockSize`, ...). It is left out of
+the file when not given.
+
+## Row headers
+
+Each scenario has a purpose, a basis and a label. Up to three rows can be the
+basis of the advice (`"BasisAdvice"`); the others are `"OtherScenarios"`.
+The basis is a code from the ICES
+[CatchScenariosBasis](https://vocab.ices.dk/?ref=1570) vocabulary
+(`MSY`, `MP`, `PA`, `FMSYranges`, `NoAdv`, `Other`); empty entries become
+`"Other"`.
+
+```{r rows}
+rows <- asdRows(
+  CS_Label = tab$CS_Label,
+  CS_Purpose = tab$CS_Purpose,
+  CS_Basis = tab$CS_Basis
+)
+rows[c("AR_ID", "CS_Purpose", "CS_Basis")]
+```
+
+The row IDs (`AR_ID`) also follow the template: rows 12 to 14 are the basis of
+the advice and the other scenarios start at row 16.
+
+## Values
+
+The values are the body of the table, with one row per scenario and one
+column per column header, in the same order:
+
+```{r values}
+values <- tab[-(1:3)]
+```
+
+Empty cells are left out of the file. Values can be numbers or text, for
+example `"<1"`.
+
+## Footnotes
+
+```{r notes}
+notes <- asdNotes(
+  Symbol = c("*", "**", "***", "^", "^^", "^^^"),
+  Notes = c(
+    "ICES cannot estimate projected landings and discards.",
+    "SSB 2028 relative to SSB 2027 (96 380 tonnes).",
+    "The percent change in TAC is not presented because the advice area and TAC unit do not match.",
+    "Advice value for 2027 relative to advice value for 2026 (18 441 tonnes).",
+    paste(
+      "This probability relates to the short-term probability of SSB < Blim and is not",
+      "comparable to the long-term probability of SSB < Blim tested in simulations when",
+      "estimating fishing mortality reference points."
+    ),
+    "These reference points have not been estimated for this stock."
+  )
+)
+```
+
+Text such as `<` can be written as it is; it is escaped correctly in the file.
+
+## Checking and writing the file
+
+`writeASDxml()` checks the table and writes the file, named
+`<stockCode>_<AssessmentYear>_catch_scenarios.xml` by default:
+
+```{r write, eval = FALSE}
+writeASDxml(info, columns, rows, values, notes)
+```
+
+The checks (also available on their own as `checkASD()`) compare codes
+against the ICES vocabularies, which needs an internet connection, check the
+layout of the table against the limits of the Excel template, and check that
+the footnote symbols used in the labels match the notes. Errors stop the file
+being written; warnings are reported.
+
+For this table the checks find two notes that are not used in any label:
+
+```
+Warning message:
+  note '***' is not used in any label
+  note '^^^' is not used in any label
+```
+
+The checks can be skipped with `check = FALSE`, for example if the vocabulary
+server cannot be reached.
+
+## The file
+
+```{r show, echo = FALSE}
+file <- writeASDxml(info, columns, rows, values, notes,
+                    file = tempfile(fileext = ".xml"), check = FALSE)
+xml <- readLines(file, encoding = "UTF-8")
+```
+
+The file starts with the stock information and the column headers:
+
+```{r head, echo = FALSE, comment = ""}
+cat(xml[1:(grep("<Scenarios_Columns>", xml)[3] - 1)], sep = "\n")
+```
+
+followed by the row headers, one `Scenarios_Values` record per filled cell
+of the table, and the footnotes:
+
+```{r tail, echo = FALSE, comment = ""}
+last <- max(grep("<Scenarios_Values>", xml))
+cat(xml[last:length(xml)], sep = "\n")
+```
+
+## Uploading
+
+Upload the file at <https://asd.ices.dk>.

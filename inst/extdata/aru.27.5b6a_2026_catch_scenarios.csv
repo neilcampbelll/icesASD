@@ -1,0 +1,9 @@
+"CS_Purpose","CS_Basis","CS_Label","Total catch","Projected landings*","Projected discards","F 6–14","F Projected landings*","F Projected discards*","Spawning-stock biomass","% SSB change*","% total allowable catch (TAC) change**","% advice change^","Probability SSB above Blim in 2028^^"
+"BasisAdvice","MP","Maximum sustainable yield (MSY) approach:FMSY",22865,,,0.24,,,91306,-5,,24,0
+"OtherScenarios","Other","F = 0",0,,,0,,,111006,15,,-100,0
+"OtherScenarios","Other","F = Fsq",17442,,,0.178,,,95906,0,,-5,0.1
+"OtherScenarios","Other","F = Fpa",30160,,,0.33,,,85297,-11,,64,0.4
+"OtherScenarios","Other","SSB(2028) = Blim",61490,,,0.83,,,59730,-38,,233,50
+"OtherScenarios","Other","SSB(2028) = Bpa",32891,,,0.37,,,82999,-14,,78,0
+"OtherScenarios","Other","SSB(2028) = MSY Btrigger",32891,,,0.37,,,82999,-14,,78,0
+"OtherScenarios","Other","SSB(2027) = SSB(2028)",16692,,,0.169,,,96660,0,,-9,0

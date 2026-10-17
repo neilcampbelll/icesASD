@@ -24,7 +24,7 @@ createASDxml(
 \item{scenarioNotes}{details}
 }
 \description{
-Create the XML format for catch scenario data
+Deprecated: use \code{\link{writeASDxml}} instead.
 }
 \examples{
 \dontrun{

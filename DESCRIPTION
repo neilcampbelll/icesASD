@@ -1,5 +1,5 @@
 Package: icesASD
-Version: 0.0.2
+Version: 0.1.0
 Title: Advice and Scenarios Database Web Services
 Authors@R: c(person("Colin", "Millar", role=c("aut", "cre"), email="colin.millar@ices.dk"),
              person("Luca", "Lamoni", role=c("aut"), email="luca.lamoni@ices.dk"),
@@ -8,7 +8,10 @@ Authors@R: c(person("Colin", "Millar", role=c("aut", "cre"), email="colin.millar
              person("David", "Miller", role=c("ctb")),
              person("Neil", "Maginis", role=c("ctb")))
 Depends: R (>= 3.5.0)
-Imports: icesConnect, icesSAG, glue, httr, tidyr, jsonlite, xml2, reactable
+Imports: icesConnect, icesSAG, icesVocab, glue, httr, tidyr, jsonlite, xml2, reactable, stats
+Suggests: testthat (>= 3.1.7), knitr, rmarkdown
+VignetteBuilder: knitr
+Config/testthat/edition: 3
 LazyData: yes
 Description: R interface to access the web services of the ICES Advice
              and Scenarios database <https://asd.ices.dk/AdviceList>.
