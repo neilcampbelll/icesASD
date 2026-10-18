@@ -56,17 +56,17 @@ asd_inputs_from_xml <- function(file) {
 # Table 1 of the 2026 advice for aru.27.5b6a
 aru_assumptions <- function() {
   asdAssumptions(
-    Variable = c("FTotal", "Selectivity", "StockSize", rep("Recruitment", 3),
+    variable = c("FTotal", "Selectivity", "StockSize", rep("Recruitment", 3),
                  "CatchTotal", "CatchWanted", "CatchOther"),
-    Ages = c("6-14", NA, NA, "5", "5", "5", NA, NA, NA),
-    Year = c(2026, NA, 2027, 2026, 2027, 2028, 2026, 2026, 2026),
-    Value = c(0.178, NA, 96380, 107501, 107501, 107501, 17601, NA, NA),
-    Unit = c("ratio", NA, "t", "NE3", "NE3", "NE3", "t", "t", "t"),
-    Basis = c("CatchConstraint", "Estimate", "Forecast", rep("Resampled", 3),
+    ages = c("6-14", NA, NA, "5", "5", "5", NA, NA, NA),
+    year = c(2026, NA, 2027, 2026, 2027, 2028, 2026, 2026, 2026),
+    value = c(0.178, NA, 96380, 107501, 107501, 107501, 17601, NA, NA),
+    unit = c("ratio", NA, "t", "NE3", "NE3", "NE3", "t", "t", "t"),
+    basis = c("CatchConstraint", "Estimate", "Forecast", rep("Resampled", 3),
               "CatchConstraint", NA, NA),
-    YearFrom = c(NA, 2025, NA, 2023, 2023, 2023, NA, NA, NA),
-    YearTo = c(NA, 2025, NA, 2025, 2025, 2025, NA, NA, NA),
-    Notes = c(
+    from = c(NA, 2025, NA, 2023, 2023, 2023, NA, NA, NA),
+    to = c(NA, 2025, NA, 2025, 2025, 2025, NA, NA, NA),
+    note = c(
       "Based on a catch of 17 601 tonnes for 2026.",
       "Exploitation pattern as estimated for 2025.",
       "Short-term forecast; in tonnes.",

@@ -5,36 +5,38 @@
 \title{Record the assumptions of the short-term forecast}
 \usage{
 asdAssumptions(
-  Variable,
-  Year = NA,
-  Value = NA,
-  Unit = NA,
-  Basis = NA,
-  YearFrom = NA,
-  YearTo = NA,
-  Ages = NA,
-  Notes = NA
+  variable,
+  year = NA,
+  value = NA,
+  unit = NA,
+  basis = NA,
+  from = NA,
+  to = NA,
+  ages = NA,
+  note = NA
 )
 }
 \arguments{
-\item{Variable}{what the row records, see Variables.}
+\item{variable}{what the row records, see Variables.}
 
-\item{Year}{the year the value applies to.}
+\item{year}{the year the value applies to.}
 
-\item{Value}{the value used. Can be text, e.g. the name of the software.}
+\item{value}{the value used. Can be text, e.g. the name of the software.}
 
-\item{Unit}{unit of the value, as an ICES MUNIT code (e.g. "t", "NE3", "ratio").}
+\item{unit}{unit of the value, as an ICES MUNIT code (e.g. "t", "NE3", "ratio").}
 
-\item{Basis}{how the value was set, see Basis.}
+\item{basis}{how the value was set, see Basis.}
 
-\item{YearFrom, YearTo}{the years used, e.g. to average or resample.}
+\item{from, to}{the years used, e.g. to average or resample.}
 
-\item{Ages}{the ages, e.g. "6-14" for F, or "5" for recruitment.}
+\item{ages}{the ages, e.g. "6-14" for F, or "5" for recruitment.}
 
-\item{Notes}{text explaining the value, as in Table 1 of the advice sheet.}
+\item{note}{text explaining the value, as in Table 1 of the advice sheet.}
 }
 \value{
-a data frame.
+a data frame, with the names used in the XML file (\code{Variable},
+        \code{Ages}, \code{Year}, \code{Value}, \code{Unit}, \code{Basis},
+        \code{YearFrom}, \code{YearTo}, \code{Notes}).
 }
 \description{
 Create the assumptions behind a catch scenarios table: the values used in
@@ -50,24 +52,24 @@ provisional until an ICES vocabulary is agreed.
 }
 \section{Variables}{
 
-Values used in the forecast, which need a \code{Year}:
+Values used in the forecast, which need a \code{year}:
 \describe{
   \item{CatchTotal, CatchWanted, CatchOther}{total catch, projected landings
     and projected discards}
-  \item{FTotal, Fwanted, FOther}{fishing mortality, give the ages in \code{Ages}}
+  \item{FTotal, Fwanted, FOther}{fishing mortality, give the ages in \code{ages}}
   \item{StockSize}{SSB}
-  \item{Recruitment}{recruitment, give the age in \code{Ages}}
+  \item{Recruitment}{recruitment, give the age in \code{ages}}
 }
-Settings of the forecast, usually with no \code{Year}:
+Settings of the forecast, usually with no \code{year}:
 \describe{
-  \item{ForecastMethod}{the software in \code{Value}, and a basis of
+  \item{ForecastMethod}{the software in \code{value}, and a basis of
     "Deterministic" or "Stochastic"}
   \item{Iterations}{the number of simulations}
   \item{ForecastStatistic}{the statistic reported, a basis of "Median" or "Mean"}
   \item{StockWeights, CatchWeights, LandingsWeights, DiscardsWeights,
     Maturity, NaturalMortality, Selectivity, DiscardFraction}{how each was
-    set for the forecast years, with the years used in \code{YearFrom} and
-    \code{YearTo}}
+    set for the forecast years, with the years used in \code{from} and
+    \code{to}}
   \item{FBeforeSpawning, MBeforeSpawning}{the proportion of F and M before
     spawning}
 }
@@ -80,7 +82,7 @@ Settings of the forecast, usually with no \code{Year}:
   \item{Forecast}{a result of the forecast}
   \item{StatusQuo, TAC, CatchConstraint}{how the intermediate year was set}
   \item{Mean, GeometricMean, Median, Resampled, MeanRescaled}{taken from the
-    years \code{YearFrom} to \code{YearTo}; "MeanRescaled" is a mean
+    years \code{from} to \code{to}; "MeanRescaled" is a mean
     selection pattern rescaled to the F of the last year}
   \item{Model}{modelled, e.g. stock weights from a model}
   \item{Fixed}{a fixed value}
@@ -91,14 +93,14 @@ Settings of the forecast, usually with no \code{Year}:
 \examples{
 # from Table 1 of the 2026 advice for aru.27.5b6a
 asdAssumptions(
-  Variable = c("FTotal", "StockSize", "Recruitment", "CatchTotal"),
-  Ages = c("6-14", NA, "5", NA),
-  Year = c(2026, 2027, 2026, 2026),
-  Value = c(0.178, 96380, 107501, 17601),
-  Unit = c("ratio", "t", "NE3", "t"),
-  Basis = c("CatchConstraint", "Forecast", "Resampled", "CatchConstraint"),
-  YearFrom = c(NA, NA, 2023, NA),
-  YearTo = c(NA, NA, 2025, NA)
+  variable = c("FTotal", "StockSize", "Recruitment", "CatchTotal"),
+  ages = c("6-14", NA, "5", NA),
+  year = c(2026, 2027, 2026, 2026),
+  value = c(0.178, 96380, 107501, 17601),
+  unit = c("ratio", "t", "NE3", "t"),
+  basis = c("CatchConstraint", "Forecast", "Resampled", "CatchConstraint"),
+  from = c(NA, NA, 2023, NA),
+  to = c(NA, NA, 2025, NA)
 )
 
 }

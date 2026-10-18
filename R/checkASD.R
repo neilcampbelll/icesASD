@@ -95,26 +95,26 @@ checkASD <- function(info, columns, rows, values, notes = NULL, assumptions = NU
       v <- a$Variable[i]
       what <- paste0("assumption ", i, if (!isBlank(v)) paste0(" (", v, ")"))
       if (isBlank(v)) {
-        addError(what, " has no Variable")
+        addError(what, " has no variable")
       } else if (!v %in% c(asd_assumption_values, asd_assumption_settings)) {
-        addWarning(what, ": Variable '", v, "' is not one of the provisional codes")
+        addWarning(what, ": variable '", v, "' is not one of the provisional codes")
       }
       if (!isBlank(a$Basis[i]) && !a$Basis[i] %in% asd_assumption_basis) {
-        addWarning(what, ": Basis '", a$Basis[i], "' is not one of the provisional codes")
+        addWarning(what, ": basis '", a$Basis[i], "' is not one of the provisional codes")
       }
       if (v %in% asd_assumption_values) {
-        if (isBlank(a$Year[i])) addError(what, " has no Year")
-        if (isBlank(a$Value[i]) && isBlank(a$Notes[i])) addWarning(what, " has no Value and no Notes")
+        if (isBlank(a$Year[i])) addError(what, " has no year")
+        if (isBlank(a$Value[i]) && isBlank(a$Notes[i])) addWarning(what, " has no value and no note")
       }
       from <- a$YearFrom[i]
       to <- a$YearTo[i]
       if (isBlank(from) != isBlank(to)) {
-        addError(what, " needs both YearFrom and YearTo")
+        addError(what, " needs both from and to")
       } else if (!isBlank(from) && as.numeric(from) > as.numeric(to)) {
-        addError(what, ": YearFrom (", from, ") is after YearTo (", to, ")")
+        addError(what, ": from (", from, ") is after to (", to, ")")
       }
       if (a$Basis[i] %in% asd_assumption_averages && !v %in% "ForecastStatistic" && isBlank(from)) {
-        addWarning(what, ": Basis '", a$Basis[i], "' needs the years used (YearFrom and YearTo)")
+        addWarning(what, ": basis '", a$Basis[i], "' needs the years used (from and to)")
       }
     }
     key <- paste(a$Variable, a$Ages, a$Year)

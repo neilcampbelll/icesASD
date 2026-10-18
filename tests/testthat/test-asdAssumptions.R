@@ -9,7 +9,7 @@ check_assumptions <- function(modify = function(a) a) {
 }
 
 test_that("asdAssumptions recycles and orders its fields", {
-  a <- asdAssumptions("Recruitment", Year = 2026:2028, Value = 107501, Ages = "5")
+  a <- asdAssumptions("Recruitment", year = 2026:2028, value = 107501, ages = "5")
   expect_equal(nrow(a), 3)
   expect_equal(
     names(a),
@@ -29,19 +29,19 @@ test_that("codes outside the provisional lists are warnings", {
   local_mocked_bindings(asd_vocab_keys = mock_vocab)
   res <- check_assumptions(function(a) { a$Variable[3] <- "SSB"; a$Basis[1] <- "Guess"; a })
   expect_length(res$errors, 0)
-  expect_match(res$warnings, "Variable 'SSB' is not one of the provisional codes", all = FALSE)
-  expect_match(res$warnings, "Basis 'Guess' is not one of the provisional codes", all = FALSE)
+  expect_match(res$warnings, "variable 'SSB' is not one of the provisional codes", all = FALSE)
+  expect_match(res$warnings, "basis 'Guess' is not one of the provisional codes", all = FALSE)
 })
 
 test_that("values, years and units are checked", {
   local_mocked_bindings(asd_vocab_keys = mock_vocab)
-  expect_match(check_assumptions(function(a) { a$Year[1] <- NA; a })$errors, "assumption 1 \\(FTotal\\) has no Year", all = FALSE)
-  expect_match(check_assumptions(function(a) { a$YearTo[4] <- NA; a })$errors, "needs both YearFrom and YearTo", all = FALSE)
-  expect_match(check_assumptions(function(a) { a$YearFrom[4] <- 2026; a })$errors, "YearFrom \\(2026\\) is after YearTo \\(2025\\)", all = FALSE)
+  expect_match(check_assumptions(function(a) { a$Year[1] <- NA; a })$errors, "assumption 1 \\(FTotal\\) has no year", all = FALSE)
+  expect_match(check_assumptions(function(a) { a$YearTo[4] <- NA; a })$errors, "needs both from and to", all = FALSE)
+  expect_match(check_assumptions(function(a) { a$YearFrom[4] <- 2026; a })$errors, "from \\(2026\\) is after to \\(2025\\)", all = FALSE)
   expect_match(check_assumptions(function(a) { a$Unit[3] <- "tonnes"; a })$errors, "MUNIT", all = FALSE)
   expect_match(check_assumptions(function(a) { a$Year[5] <- 2026; a })$errors, "'Recruitment 5 2026' is given more than once", all = FALSE)
-  expect_match(check_assumptions(function(a) { a$YearFrom[4:6] <- NA; a$YearTo[4:6] <- NA; a })$warnings, "Basis 'Resampled' needs the years used", all = FALSE)
-  expect_match(check_assumptions(function(a) { a$Notes[8] <- NA; a })$warnings, "assumption 8 \\(CatchWanted\\) has no Value and no Notes", all = FALSE)
+  expect_match(check_assumptions(function(a) { a$YearFrom[4:6] <- NA; a$YearTo[4:6] <- NA; a })$warnings, "basis 'Resampled' needs the years used", all = FALSE)
+  expect_match(check_assumptions(function(a) { a$Notes[8] <- NA; a })$warnings, "assumption 8 \\(CatchWanted\\) has no value and no note", all = FALSE)
 })
 
 test_that("assumptions are written only when given, after the notes", {

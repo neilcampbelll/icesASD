@@ -122,8 +122,10 @@ asd_prepare <- function(info, columns, rows, values, notes, assumptions = NULL) 
   }
 
   if (!is.null(assumptions)) {
-    assumptions <- as.list(as.data.frame(assumptions, stringsAsFactors = FALSE))
-    assumptions <- do.call(asdAssumptions, assumptions[intersect(names(assumptions), names(formals(asdAssumptions)))])
+    assumptions <- asd_rebuild(assumptions, asdAssumptions, c(
+      Variable = "variable", Ages = "ages", Year = "year", Value = "value", Unit = "unit",
+      Basis = "basis", YearFrom = "from", YearTo = "to", Notes = "note"
+    ))
   }
 
   values <- as.data.frame(values, stringsAsFactors = FALSE)
