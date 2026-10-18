@@ -6,7 +6,8 @@ Authors@R: c(person("Colin", "Millar", role=c("aut", "cre"), email="colin.millar
              person("Carlos", "Pinto", role=c("aut")),
              person("Laura", "Petre", role=c("aut")),
              person("David", "Miller", role=c("ctb")),
-             person("Neil", "Maginis", role=c("ctb")))
+             person("Neil", "Maginis", role=c("ctb")),
+             person("Neil", "Campbell", role=c("ctb")))
 Depends: R (>= 3.5.0)
 Imports: icesConnect, icesSAG, icesVocab, glue, httr, tidyr, jsonlite, xml2, reactable, stats
 Suggests: testthat (>= 3.1.7), knitr, rmarkdown
