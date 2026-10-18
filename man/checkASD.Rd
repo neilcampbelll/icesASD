@@ -4,7 +4,7 @@
 \alias{checkASD}
 \title{Check a catch scenarios table before writing the upload file}
 \usage{
-checkASD(info, columns, rows, values, notes = NULL)
+checkASD(info, columns, rows, values, notes = NULL, assumptions = NULL)
 }
 \arguments{
 \item{info}{stock information, see \code{\link{asdInfo}}.}
@@ -19,6 +19,10 @@ header (in the order of \code{columns}).  Values can be numbers or
 text (e.g. "<1"); empty cells (\code{NA} or "") are left out.}
 
 \item{notes}{footnotes, see \code{\link{asdNotes}}.}
+
+\item{assumptions}{optional forecast assumptions, see \code{\link{asdAssumptions}}.
+These are not yet part of the ASD upload format, so a file
+that includes them is for testing the proposal only.}
 }
 \value{
 a list with two character vectors: \code{errors} and \code{warnings}.
@@ -26,7 +30,9 @@ a list with two character vectors: \code{errors} and \code{warnings}.
 \description{
 Checks codes against the ICES vocabularies (using \pkg{icesVocab}), the
 layout of the table against the limits of the ICES catch scenarios template,
-and that footnote symbols used in the labels match the notes.
+and that footnote symbols used in the labels match the notes.  Forecast
+assumptions, if given, are checked against the provisional codes listed in
+\code{\link{asdAssumptions}}; codes not in those lists are warnings, not errors.
 }
 \details{
 Vocabulary checks need an internet connection.  If a vocabulary cannot be

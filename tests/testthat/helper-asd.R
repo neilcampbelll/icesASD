@@ -30,7 +30,8 @@ read_asd_xml <- function(file) {
     columns = section("Scenarios_Columns"),
     rows = section("Scenarios_Rows"),
     values = section("Scenarios_Values"),
-    notes = section("Catch_Scenario_Notes_Notes")
+    notes = section("Catch_Scenario_Notes_Notes"),
+    assumptions = section("Forecast_Assumptions")
   )
 }
 
@@ -49,5 +50,30 @@ asd_inputs_from_xml <- function(file) {
     rows = asdRows(x$rows$CS_Label, x$rows$CS_Basis, x$rows$CS_Purpose),
     values = as.data.frame(values, stringsAsFactors = FALSE),
     notes = asdNotes(x$notes$Symbol, x$notes$Notes)
+  )
+}
+
+# Table 1 of the 2026 advice for aru.27.5b6a
+aru_assumptions <- function() {
+  asdAssumptions(
+    Variable = c("FTotal", "Selectivity", "StockSize", rep("Recruitment", 3),
+                 "CatchTotal", "CatchWanted", "CatchOther"),
+    Ages = c("6-14", NA, NA, "5", "5", "5", NA, NA, NA),
+    Year = c(2026, NA, 2027, 2026, 2027, 2028, 2026, 2026, 2026),
+    Value = c(0.178, NA, 96380, 107501, 107501, 107501, 17601, NA, NA),
+    Unit = c("ratio", NA, "t", "NE3", "NE3", "NE3", "t", "t", "t"),
+    Basis = c("CatchConstraint", "Estimate", "Forecast", rep("Resampled", 3),
+              "CatchConstraint", NA, NA),
+    YearFrom = c(NA, 2025, NA, 2023, 2023, 2023, NA, NA, NA),
+    YearTo = c(NA, 2025, NA, 2025, 2025, 2025, NA, NA, NA),
+    Notes = c(
+      "Based on a catch of 17 601 tonnes for 2026.",
+      "Exploitation pattern as estimated for 2025.",
+      "Short-term forecast; in tonnes.",
+      rep("Mean recruitment, resampled from medians from the years 2023-2025; thousands.", 3),
+      "Catch constraint based on the ratio of TAC to catch since 2010 (ICES, 2023a); in tonnes.",
+      "ICES cannot estimate projected landings.",
+      "ICES cannot estimate projected discards."
+    )
   )
 }

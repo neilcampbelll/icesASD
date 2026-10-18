@@ -10,6 +10,7 @@ writeASDxml(
   rows,
   values,
   notes = NULL,
+  assumptions = NULL,
   file = NULL,
   check = TRUE
 )
@@ -27,6 +28,10 @@ header (in the order of \code{columns}).  Values can be numbers or
 text (e.g. "<1"); empty cells (\code{NA} or "") are left out.}
 
 \item{notes}{footnotes, see \code{\link{asdNotes}}.}
+
+\item{assumptions}{optional forecast assumptions, see \code{\link{asdAssumptions}}.
+These are not yet part of the ASD upload format, so a file
+that includes them is for testing the proposal only.}
 
 \item{file}{the name of the xml file to write.  Defaults to
 \code{<stockCode>_<AssessmentYear>_catch_scenarios.xml}.}

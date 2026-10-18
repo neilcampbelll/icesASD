@@ -2,7 +2,9 @@
 #'
 #' Checks codes against the ICES vocabularies (using \pkg{icesVocab}), the
 #' layout of the table against the limits of the ICES catch scenarios template,
-#' and that footnote symbols used in the labels match the notes.
+#' and that footnote symbols used in the labels match the notes.  Forecast
+#' assumptions, if given, are checked against the provisional codes listed in
+#' \code{\link{asdAssumptions}}; codes not in those lists are warnings, not errors.
 #'
 #' Vocabulary checks need an internet connection.  If a vocabulary cannot be
 #' downloaded, a warning is given and that check is skipped.
@@ -14,8 +16,8 @@
 #' @seealso \code{\link{writeASDxml}} runs these checks before writing the file.
 #'
 #' @export
-checkASD <- function(info, columns, rows, values, notes = NULL) {
-  x <- asd_prepare(info, columns, rows, values, notes)
+checkASD <- function(info, columns, rows, values, notes = NULL, assumptions = NULL) {
+  x <- asd_prepare(info, columns, rows, values, notes, assumptions)
 
   errors <- character(0)
   warnings <- character(0)
@@ -40,6 +42,7 @@ checkASD <- function(info, columns, rows, values, notes = NULL) {
   checkVocab(x$columns$Unit, "MUNIT", "unit")
   checkVocab(x$columns$CatchScenarioVariables, "StockDataType", "column type")
   checkVocab(x$rows$CS_Basis, "CatchScenariosBasis", "basis")
+  if (!is.null(x$assumptions)) checkVocab(x$assumptions$Unit, "MUNIT", "assumption unit")
 
   # ---- stock information ----
   if (isBlank(x$info$stockCode)) addError("stockCode is missing")
@@ -84,6 +87,39 @@ checkASD <- function(info, columns, rows, values, notes = NULL) {
   defined <- if (is.null(x$notes)) character(0) else trimws(as.character(x$notes$Symbol))
   for (s in setdiff(used, defined)) addWarning("footnote symbol '", s, "' is used in a label but has no note")
   for (s in setdiff(defined, used)) addWarning("note '", s, "' is not used in any label")
+
+  # ---- forecast assumptions ----
+  a <- x$assumptions
+  if (!is.null(a)) {
+    for (i in seq_len(nrow(a))) {
+      v <- a$Variable[i]
+      what <- paste0("assumption ", i, if (!isBlank(v)) paste0(" (", v, ")"))
+      if (isBlank(v)) {
+        addError(what, " has no Variable")
+      } else if (!v %in% c(asd_assumption_values, asd_assumption_settings)) {
+        addWarning(what, ": Variable '", v, "' is not one of the provisional codes")
+      }
+      if (!isBlank(a$Basis[i]) && !a$Basis[i] %in% asd_assumption_basis) {
+        addWarning(what, ": Basis '", a$Basis[i], "' is not one of the provisional codes")
+      }
+      if (v %in% asd_assumption_values) {
+        if (isBlank(a$Year[i])) addError(what, " has no Year")
+        if (isBlank(a$Value[i]) && isBlank(a$Notes[i])) addWarning(what, " has no Value and no Notes")
+      }
+      from <- a$YearFrom[i]
+      to <- a$YearTo[i]
+      if (isBlank(from) != isBlank(to)) {
+        addError(what, " needs both YearFrom and YearTo")
+      } else if (!isBlank(from) && as.numeric(from) > as.numeric(to)) {
+        addError(what, ": YearFrom (", from, ") is after YearTo (", to, ")")
+      }
+      if (a$Basis[i] %in% asd_assumption_averages && !v %in% "ForecastStatistic" && isBlank(from)) {
+        addWarning(what, ": Basis '", a$Basis[i], "' needs the years used (YearFrom and YearTo)")
+      }
+    }
+    key <- paste(a$Variable, a$Ages, a$Year)
+    for (k in unique(key[duplicated(key)])) addError("assumption '", k, "' is given more than once")
+  }
 
   list(errors = errors, warnings = warnings)
 }

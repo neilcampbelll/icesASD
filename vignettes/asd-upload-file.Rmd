@@ -189,3 +189,60 @@ cat(xml[last:length(xml)], sep = "\n")
 ## Uploading
 
 Upload the file at <https://asd.ices.dk>.
+
+## Forecast assumptions (proposed)
+
+The assumptions of the short-term forecast, Table 1 of the advice sheet, are
+not yet part of the upload
+([icesSAG #308](https://github.com/ices-tools-prod/icesSAG/issues/308)).
+`asdAssumptions()` is a proposal for recording them: one row per value or
+setting, with the value used and its basis, so that the forecast can be
+repeated from the record. The codes are provisional; see `?asdAssumptions`.
+
+Table 1 for this stock:
+
+```{r assumptions}
+assumptions <- asdAssumptions(
+  Variable = c("FTotal", "Selectivity", "StockSize", rep("Recruitment", 3),
+               "CatchTotal", "CatchWanted", "CatchOther"),
+  Ages = c("6-14", NA, NA, "5", "5", "5", NA, NA, NA),
+  Year = c(2026, NA, 2027, 2026, 2027, 2028, 2026, 2026, 2026),
+  Value = c(0.178, NA, 96380, 107501, 107501, 107501, 17601, NA, NA),
+  Unit = c("ratio", NA, "t", "NE3", "NE3", "NE3", "t", "t", "t"),
+  Basis = c("CatchConstraint", "Estimate", "Forecast", rep("Resampled", 3),
+            "CatchConstraint", NA, NA),
+  YearFrom = c(NA, 2025, NA, 2023, 2023, 2023, NA, NA, NA),
+  YearTo = c(NA, 2025, NA, 2025, 2025, 2025, NA, NA, NA),
+  Notes = c(
+    "Based on a catch of 17 601 tonnes for 2026.",
+    "Exploitation pattern as estimated for 2025.",
+    "Short-term forecast; in tonnes.",
+    rep("Mean recruitment, resampled from medians from the years 2023-2025; thousands.", 3),
+    "Catch constraint based on the ratio of TAC to catch since 2010 (ICES, 2023a); in tonnes.",
+    "ICES cannot estimate projected landings.",
+    "ICES cannot estimate projected discards."
+  )
+)
+assumptions[c("Variable", "Ages", "Year", "Value", "Basis", "YearFrom", "YearTo")]
+```
+
+The settings of the forecast, such as the years averaged for weights and
+maturity, are recorded in the same way, usually with no `Year`.
+
+Given to `writeASDxml()`, the assumptions are checked and written after the
+footnotes, one `Forecast_Assumptions` record per row:
+
+```{r assumptions-write, eval = FALSE}
+writeASDxml(info, columns, rows, values, notes, assumptions)
+```
+
+```{r assumptions-show, echo = FALSE, comment = ""}
+file <- writeASDxml(info, columns, rows, values, notes, assumptions,
+                    file = tempfile(fileext = ".xml"), check = FALSE)
+xml <- readLines(file, encoding = "UTF-8")
+first <- grep("<Forecast_Assumptions>", xml)[4]
+cat(xml[first:(grep("</Forecast_Assumptions>", xml)[4])], sep = "\n")
+```
+
+A file with assumptions is for trying out the proposal; the ASD does not
+accept them yet.

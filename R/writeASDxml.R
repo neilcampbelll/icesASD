@@ -15,6 +15,9 @@
 #'               header (in the order of \code{columns}).  Values can be numbers or
 #'               text (e.g. "<1"); empty cells (\code{NA} or "") are left out.
 #' @param notes footnotes, see \code{\link{asdNotes}}.
+#' @param assumptions optional forecast assumptions, see \code{\link{asdAssumptions}}.
+#'                    These are not yet part of the ASD upload format, so a file
+#'                    that includes them is for testing the proposal only.
 #' @param file the name of the xml file to write.  Defaults to
 #'             \code{<stockCode>_<AssessmentYear>_catch_scenarios.xml}.
 #' @param check should the data be checked before writing? Default is TRUE.
@@ -33,11 +36,11 @@
 #' }
 #' @export
 writeASDxml <- function(info, columns, rows, values, notes = NULL,
-                        file = NULL, check = TRUE) {
-  x <- asd_prepare(info, columns, rows, values, notes)
+                        assumptions = NULL, file = NULL, check = TRUE) {
+  x <- asd_prepare(info, columns, rows, values, notes, assumptions)
 
   if (check) {
-    res <- checkASD(info, columns, rows, values, notes)
+    res <- checkASD(info, columns, rows, values, notes, assumptions)
     if (length(res$warnings)) {
       warning(paste0("\n  ", res$warnings, collapse = ""), call. = FALSE)
     }
@@ -94,6 +97,12 @@ writeASDxml <- function(info, columns, rows, values, notes = NULL,
     }
   }
 
+  if (!is.null(x$assumptions)) {
+    for (i in seq_len(nrow(x$assumptions))) {
+      asd_add_values(xml2::xml_add_child(doc, "Forecast_Assumptions"), as.list(x$assumptions[i, ]))
+    }
+  }
+
   xml2::write_xml(doc, file, encoding = "utf-8")
 
   invisible(file)
@@ -101,7 +110,7 @@ writeASDxml <- function(info, columns, rows, values, notes = NULL,
 
 # standardise the inputs: rebuild headers (and IDs) with the constructors and
 # convert values to a character matrix with NA for empty cells
-asd_prepare <- function(info, columns, rows, values, notes) {
+asd_prepare <- function(info, columns, rows, values, notes, assumptions = NULL) {
   info <- unclass(info)
   info <- do.call(asdInfo, info[intersect(names(info), c("stockCode", "AssessmentYear", "contact"))])
 
@@ -112,6 +121,11 @@ asd_prepare <- function(info, columns, rows, values, notes) {
     notes <- as.data.frame(notes, stringsAsFactors = FALSE)[c("Symbol", "Notes")]
   }
 
+  if (!is.null(assumptions)) {
+    assumptions <- as.list(as.data.frame(assumptions, stringsAsFactors = FALSE))
+    assumptions <- do.call(asdAssumptions, assumptions[intersect(names(assumptions), names(formals(asdAssumptions)))])
+  }
+
   values <- as.data.frame(values, stringsAsFactors = FALSE)
   m <- matrix(NA_character_, nrow = nrow(values), ncol = ncol(values))
   for (j in seq_along(values)) {
@@ -119,7 +133,8 @@ asd_prepare <- function(info, columns, rows, values, notes) {
   }
   values <- m
 
-  list(info = info, columns = columns, rows = rows, values = values, notes = notes)
+  list(info = info, columns = columns, rows = rows, values = values, notes = notes,
+       assumptions = assumptions)
 }
 
 # call a constructor on a data frame it made, mapping the file names back to
