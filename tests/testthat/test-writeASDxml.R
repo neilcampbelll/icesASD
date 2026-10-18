@@ -36,12 +36,12 @@ test_that("root element and processing instructions match the template", {
 
 test_that("IDs follow the template numbering", {
   rows <- asdRows(
-    CS_Label = c("a", "b", "c", "d", "e"),
-    CS_Purpose = c("OtherScenarios", "BasisAdvice", "OtherScenarios", "BasisAdvice", "OtherScenarios")
+    label = c("a", "b", "c", "d", "e"),
+    purpose = c("OtherScenarios", "BasisAdvice", "OtherScenarios", "BasisAdvice", "OtherScenarios")
   )
   expect_equal(rows$AR_ID, c(16L, 12L, 17L, 13L, 18L))
   expect_equal(asdColumns(c("x", "y", "z"), 2027, "t")$AK_ID, 5:7)
-  expect_equal(asdRows("a", "BasisAdvice", NA)$CS_Basis, "Other")
+  expect_equal(asdRows("a", NA, "BasisAdvice")$CS_Basis, "Other")
 })
 
 test_that("special characters are escaped once and kept in UTF-8", {
@@ -66,7 +66,7 @@ test_that("empty cells are left out and numbers are written in full", {
   local_mocked_bindings(asd_vocab_keys = mock_vocab)
   info <- asdInfo("aru.27.5b6a", 2026, "Assessor Name")
   columns <- asdColumns(c("Total catch", "Projected landings"), 2027, "t")
-  rows <- asdRows(c("MSY approach", "F = 0"), c("BasisAdvice", "OtherScenarios"), c("MSY", "Other"))
+  rows <- asdRows(c("MSY approach", "F = 0"), c("MSY", "Other"), c("BasisAdvice", "OtherScenarios"))
   values <- data.frame(catch = c(1234567890, 0), landings = c(NA, ""))
 
   new <- read_asd_xml(write_ref(list(info = info, columns = columns, rows = rows, values = values, notes = NULL)))

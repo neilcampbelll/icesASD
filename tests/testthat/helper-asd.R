@@ -46,7 +46,7 @@ asd_inputs_from_xml <- function(file) {
   list(
     info = asdInfo(x$info$stockCode, as.numeric(x$info$AssessmentYear), x$info$contact),
     columns = asdColumns(x$columns$AK_Label, x$columns$YearLabel, x$columns$Unit),
-    rows = asdRows(x$rows$CS_Label, x$rows$CS_Purpose, x$rows$CS_Basis),
+    rows = asdRows(x$rows$CS_Label, x$rows$CS_Basis, x$rows$CS_Purpose),
     values = as.data.frame(values, stringsAsFactors = FALSE),
     notes = asdNotes(x$notes$Symbol, x$notes$Notes)
   )

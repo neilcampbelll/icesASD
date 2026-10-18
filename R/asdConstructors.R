@@ -3,29 +3,31 @@
 #' Helper functions to create the stock information, column and row headers,
 #' and notes of a catch scenarios table, for writing with \code{\link{writeASDxml}}.
 #'
-#' Column and row IDs follow the numbering of the ICES catch scenarios Excel
-#' template: columns (\code{AK_ID}) are numbered from 5, basis of advice rows
-#' (\code{AR_ID}) are numbered 12 to 14, and other scenario rows from 16.
+#' The arguments follow the labels of the ICES catch scenarios Excel template.
+#' The data frames returned use the names of the XML file, so they can be
+#' compared with an exported file.  The column and row IDs (\code{AK_ID},
+#' \code{AR_ID}) are the column and row numbers of the template: columns are
+#' numbered from 5 (column E), basis of advice rows 12 to 14, and other
+#' scenario rows from 16.
 #'
 #' @param stockCode the ICES stock code, e.g. "aru.27.5b6a".
 #' @param AssessmentYear the assessment year.
 #' @param contact the name of the contact person.
-#' @param AK_Label column labels, including any footnote symbols.
-#' @param YearLabel the year each column refers to.  For \% change columns
-#'                  give the last year.
-#' @param Unit units of each column, as ICES MUNIT codes (e.g. "t", "ratio", "\%").
-#' @param CatchScenarioVariables optional type of each column, as codes from the
-#'                               ICES StockDataType vocabulary (e.g. "Catch",
-#'                               "FishingPressure", "StockSize").  Left out of the
-#'                               file when NA.
-#' @param CS_Label scenario labels, including any footnote symbols.
-#' @param CS_Purpose "BasisAdvice" for the basis of the advice (up to three rows),
-#'                   or "OtherScenarios".
-#' @param CS_Basis the basis of each scenario, as codes from the ICES
-#'                 CatchScenariosBasis vocabulary (e.g. "MSY", "MP", "PA", "Other").
-#'                 Empty entries are set to "Other".
-#' @param Symbol footnote symbols, e.g. "*", "**", "^".
-#' @param Notes the footnote text for each symbol.
+#' @param label for columns, the table headers; for rows, the scenario labels.
+#'              Footnote symbols are part of the label.
+#' @param year the year each column refers to.  For \% change columns give the
+#'             last year.
+#' @param unit units of each column, as ICES MUNIT codes (e.g. "t", "ratio", "\%").
+#' @param type optional type of each column, as codes from the ICES
+#'             StockDataType vocabulary (e.g. "Catch", "FishingPressure",
+#'             "StockSize").  Left out of the file when NA.
+#' @param basis the basis of each scenario, as codes from the ICES
+#'              CatchScenariosBasis vocabulary (e.g. "MSY", "MP", "PA", "Other").
+#'              Empty entries are set to "Other".
+#' @param purpose "BasisAdvice" for the basis of the advice (up to three rows),
+#'                or "OtherScenarios".
+#' @param symbol footnote symbols, e.g. "*", "**", "^".
+#' @param note the footnote text for each symbol.
 #'
 #' @return \code{asdInfo} returns a list, the others return data frames.
 #'
@@ -35,20 +37,20 @@
 #' info <- asdInfo("aru.27.5b6a", 2026, "Assessor Name")
 #'
 #' columns <- asdColumns(
-#'   AK_Label = c("Total catch", "F 6–14", "Spawning-stock biomass"),
-#'   YearLabel = c(2027, 2027, 2028),
-#'   Unit = c("t", "ratio", "t")
+#'   label = c("Total catch", "F 6–14", "Spawning-stock biomass"),
+#'   year = c(2027, 2027, 2028),
+#'   unit = c("t", "ratio", "t")
 #' )
 #' columns
 #'
 #' rows <- asdRows(
-#'   CS_Label = c("MSY approach: FMSY", "F = 0", "F = Fpa"),
-#'   CS_Purpose = c("BasisAdvice", "OtherScenarios", "OtherScenarios"),
-#'   CS_Basis = c("MSY", "Other", "Other")
+#'   label = c("MSY approach: FMSY", "F = 0", "F = Fpa"),
+#'   basis = c("MSY", "Other", "Other"),
+#'   purpose = c("BasisAdvice", "OtherScenarios", "OtherScenarios")
 #' )
 #' rows
 #'
-#' notes <- asdNotes(Symbol = "*", Notes = "SSB 2028 relative to SSB 2027.")
+#' notes <- asdNotes(symbol = "*", note = "SSB 2028 relative to SSB 2027.")
 #'
 #' @rdname asdConstructors
 #' @export
@@ -66,12 +68,12 @@ asdInfo <- function(stockCode, AssessmentYear, contact) {
 
 #' @rdname asdConstructors
 #' @export
-asdColumns <- function(AK_Label, YearLabel, Unit, CatchScenarioVariables = NA) {
+asdColumns <- function(label, year, unit, type = NA) {
   out <- data.frame(
-    AK_Label = AK_Label,
-    YearLabel = YearLabel,
-    Unit = Unit,
-    CatchScenarioVariables = CatchScenarioVariables,
+    AK_Label = label,
+    YearLabel = year,
+    Unit = unit,
+    CatchScenarioVariables = type,
     stringsAsFactors = FALSE
   )
   out <- cbind(AK_ID = 4L + seq_len(nrow(out)), out)
@@ -80,11 +82,11 @@ asdColumns <- function(AK_Label, YearLabel, Unit, CatchScenarioVariables = NA) {
 
 #' @rdname asdConstructors
 #' @export
-asdRows <- function(CS_Label, CS_Purpose = "OtherScenarios", CS_Basis = "Other") {
+asdRows <- function(label, basis = "Other", purpose = "OtherScenarios") {
   out <- data.frame(
-    CS_Purpose = CS_Purpose,
-    CS_Basis = CS_Basis,
-    CS_Label = CS_Label,
+    CS_Purpose = purpose,
+    CS_Basis = basis,
+    CS_Label = label,
     stringsAsFactors = FALSE
   )
   blank <- is.na(out$CS_Basis) | !nzchar(trimws(out$CS_Basis))
@@ -100,6 +102,6 @@ asdRows <- function(CS_Label, CS_Purpose = "OtherScenarios", CS_Basis = "Other")
 
 #' @rdname asdConstructors
 #' @export
-asdNotes <- function(Symbol, Notes) {
-  data.frame(Symbol = Symbol, Notes = Notes, stringsAsFactors = FALSE)
+asdNotes <- function(symbol, note) {
+  data.frame(Symbol = symbol, Notes = note, stringsAsFactors = FALSE)
 }

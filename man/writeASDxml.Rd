@@ -49,7 +49,7 @@ is written.  Errors stop the file being written, warnings are reported.
 \dontrun{
 info <- asdInfo("aru.27.5b6a", 2026, "Assessor Name")
 columns <- asdColumns(c("Total catch", "Spawning-stock biomass"), c(2027, 2028), c("t", "t"))
-rows <- asdRows(c("MSY approach: FMSY", "F = 0"), c("BasisAdvice", "OtherScenarios"), c("MSY", "Other"))
+rows <- asdRows(c("MSY approach: FMSY", "F = 0"), c("MSY", "Other"), c("BasisAdvice", "OtherScenarios"))
 values <- data.frame(catch = c(22865, 0), ssb = c(91306, 111006))
 writeASDxml(info, columns, rows, values)
 }

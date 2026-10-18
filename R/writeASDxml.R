@@ -27,7 +27,7 @@
 #' \dontrun{
 #' info <- asdInfo("aru.27.5b6a", 2026, "Assessor Name")
 #' columns <- asdColumns(c("Total catch", "Spawning-stock biomass"), c(2027, 2028), c("t", "t"))
-#' rows <- asdRows(c("MSY approach: FMSY", "F = 0"), c("BasisAdvice", "OtherScenarios"), c("MSY", "Other"))
+#' rows <- asdRows(c("MSY approach: FMSY", "F = 0"), c("MSY", "Other"), c("BasisAdvice", "OtherScenarios"))
 #' values <- data.frame(catch = c(22865, 0), ssb = c(91306, 111006))
 #' writeASDxml(info, columns, rows, values)
 #' }
@@ -105,11 +105,8 @@ asd_prepare <- function(info, columns, rows, values, notes) {
   info <- unclass(info)
   info <- do.call(asdInfo, info[intersect(names(info), c("stockCode", "AssessmentYear", "contact"))])
 
-  columns <- as.list(as.data.frame(columns, stringsAsFactors = FALSE))
-  columns <- do.call(asdColumns, columns[intersect(names(columns), c("AK_Label", "YearLabel", "Unit", "CatchScenarioVariables"))])
-
-  rows <- as.list(as.data.frame(rows, stringsAsFactors = FALSE))
-  rows <- do.call(asdRows, rows[intersect(names(rows), c("CS_Label", "CS_Purpose", "CS_Basis"))])
+  columns <- asd_rebuild(columns, asdColumns, c(AK_Label = "label", YearLabel = "year", Unit = "unit", CatchScenarioVariables = "type"))
+  rows <- asd_rebuild(rows, asdRows, c(CS_Label = "label", CS_Basis = "basis", CS_Purpose = "purpose"))
 
   if (!is.null(notes)) {
     notes <- as.data.frame(notes, stringsAsFactors = FALSE)[c("Symbol", "Notes")]
@@ -123,6 +120,15 @@ asd_prepare <- function(info, columns, rows, values, notes) {
   values <- m
 
   list(info = info, columns = columns, rows = rows, values = values, notes = notes)
+}
+
+# call a constructor on a data frame it made, mapping the file names back to
+# the argument names
+asd_rebuild <- function(x, fun, map) {
+  x <- as.list(as.data.frame(x, stringsAsFactors = FALSE))
+  x <- x[intersect(names(map), names(x))]
+  names(x) <- map[names(x)]
+  do.call(fun, x)
 }
 
 # one value as text, NA for empty; numbers written in full

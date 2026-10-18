@@ -37,9 +37,9 @@ checkASD <- function(info, columns, rows, values, notes = NULL) {
     }
   }
   checkVocab(x$info$stockCode, "ICES_StockCode", "stockCode")
-  checkVocab(x$columns$Unit, "MUNIT", "Unit")
-  checkVocab(x$columns$CatchScenarioVariables, "StockDataType", "CatchScenarioVariables")
-  checkVocab(x$rows$CS_Basis, "CatchScenariosBasis", "CS_Basis")
+  checkVocab(x$columns$Unit, "MUNIT", "unit")
+  checkVocab(x$columns$CatchScenarioVariables, "StockDataType", "column type")
+  checkVocab(x$rows$CS_Basis, "CatchScenariosBasis", "basis")
 
   # ---- stock information ----
   if (isBlank(x$info$stockCode)) addError("stockCode is missing")
@@ -53,18 +53,18 @@ checkASD <- function(info, columns, rows, values, notes = NULL) {
   # ---- columns ----
   if (nrow(x$columns) == 0) addError("there are no columns")
   if (nrow(x$columns) > 50) addError("there are ", nrow(x$columns), " columns, the maximum is 50")
-  for (i in which(isBlank(x$columns$AK_Label))) addError("column ", i, " has no label (AK_Label)")
-  for (i in which(isBlank(x$columns$YearLabel))) addWarning("column ", i, " (", x$columns$AK_Label[i], ") has no YearLabel")
-  for (i in which(isBlank(x$columns$Unit))) addWarning("column ", i, " (", x$columns$AK_Label[i], ") has no Unit")
+  for (i in which(isBlank(x$columns$AK_Label))) addError("column ", i, " has no label")
+  for (i in which(isBlank(x$columns$YearLabel))) addWarning("column ", i, " (", x$columns$AK_Label[i], ") has no year")
+  for (i in which(isBlank(x$columns$Unit))) addWarning("column ", i, " (", x$columns$AK_Label[i], ") has no unit")
 
   # ---- rows ----
   nBasis <- sum(x$rows$CS_Purpose %in% "BasisAdvice")
-  if (nBasis == 0) addError("there is no basis of advice row (CS_Purpose = 'BasisAdvice')")
+  if (nBasis == 0) addError("there is no basis of advice row (purpose = 'BasisAdvice')")
   if (nBasis > 3) addError("there are ", nBasis, " basis of advice rows, the maximum is 3")
   for (p in setdiff(unique(x$rows$CS_Purpose), c("BasisAdvice", "OtherScenarios"))) {
-    addError("CS_Purpose '", p, "' must be 'BasisAdvice' or 'OtherScenarios'")
+    addError("purpose '", p, "' must be 'BasisAdvice' or 'OtherScenarios'")
   }
-  for (i in which(isBlank(x$rows$CS_Label))) addError("row ", i, " has no label (CS_Label)")
+  for (i in which(isBlank(x$rows$CS_Label))) addError("row ", i, " has no label")
 
   # ---- values ----
   if (!identical(dim(x$values), c(nrow(x$rows), nrow(x$columns)))) {

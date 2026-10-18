@@ -42,7 +42,7 @@ test_that("table layout is checked", {
   )
   expect_match(
     check_ref(function(x) { x$rows$CS_Purpose[2] <- "Scenario"; x })$errors,
-    "CS_Purpose 'Scenario'", all = FALSE
+    "purpose 'Scenario'", all = FALSE
   )
   expect_match(
     check_ref(function(x) { x$columns$AK_Label[3] <- ""; x })$errors,
